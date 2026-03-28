@@ -114,7 +114,7 @@ If prop names differ from Splash conventions, add an adapter in `src/app/compone
 | Component | Key Props |
 |-----------|-----------|
 | `Sparkline` | `data: number[], width?: number, label?: string, color?: string, min?: number, max?: number` |
-| `LineChart` | `data?: number[], series?: {data: number[], label?: string, color?: string, fill?: boolean}[], width?: number, height?: number, label?: string, color?: string, showAxis?: boolean (default true), fill?: boolean` |
+| `LineChart` | `data?: number[], series?: {data: number[], label?: string, color?: string, fill?: boolean}[], width?: number, height?: number, label?: string, color?: string, showAxis?: boolean (default true), fill?: boolean, xLabels?: string[]` |
 | `Histogram` | `data: number[], bins?: number (default 15), width?: number, label?: string, color?: string, showValues?: boolean (default true)` |
 | `Heatmap` | `data: number[][], xLabels?: string[], yLabels?: string[], label?: string, color?: string ("green"\|"red"\|"blue"\|"yellow"\|"cyan"\|"magenta"\|"white"), showValues?: boolean (default false), cellWidth?: number` |
 | `BarChart` | `data: {label: string, value: number}[], width?: number` |
@@ -230,7 +230,7 @@ If prop names differ from Splash conventions, add an adapter in `src/app/compone
 }
 ```
 
-### Line Chart (multi-series)
+### Line Chart (multi-series with xLabels)
 ```json
 {
   "spec": {
@@ -244,6 +244,7 @@ If prop names differ from Splash conventions, add an adapter in `src/app/compone
             { "data": [10, 25, 30, 45, 38, 42], "label": "CPU %", "color": "green" },
             { "data": [55, 50, 60, 58, 65, 70], "label": "Memory %", "color": "cyan" }
           ],
+          "xLabels": ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
           "width": 35,
           "height": 8
         },
@@ -400,14 +401,46 @@ The tmux pane has limited width (~40-50 columns at 40% split). Use **vertical la
 - **Heatmap**: `cellWidth: 2`–`3`
 - **BarChart**: Keep labels short, `width: 25`–`35`
 - Avoid side-by-side (`flexDirection: "row"`) layouts — they overflow in narrow panes. Stack elements vertically instead.
+- **xLabels in tmux**: Keep labels short (3-4 chars like "0h", "Q1", "Mon") — long labels overlap in narrow panes. Fewer labels is better than crowded labels.
 
 ### Browser (`render-browser`)
-The browser page is full-width. SVG charts scale to fill available space automatically. Use larger sizes:
+SVG charts are capped at their viewBox width (`width` prop × 8 pixels) and scale down responsively. The `width` prop controls the maximum rendered size — use it to control chart proportions.
+
+**Single chart (full focus):**
 - **LineChart**: `width: 60`–`80`, `height: 12`–`16`
 - **Histogram**: `width: 40`–`60`
 - **Heatmap**: `cellWidth: 5`–`8`
-- Side-by-side layouts work well with `flexDirection: "row"` and `gap: 4`.
-- Colors use hex values (e.g. `"#22c55e"`) for best results.
+
+**Multi-chart dashboard (3+ visualizations):**
+- **LineChart**: `width: 40`–`50`, `height: 8`–`12`
+- **Histogram**: `width: 40`–`50`
+- **Heatmap**: `cellWidth: 3`–`5`
+- **Sparkline**: `width: 30`–`40`
+- **BarChart**: `width: 35`–`45`
+- Use `flexDirection: "column"` as the outer layout, with row sub-groups for pairing charts
+
+**Row pairing rules (IMPORTANT):**
+- Only pair components with **similar visual height** in a row. Good pairs:
+  - LineChart + BarChart (both vertically compact)
+  - Histogram + Heatmap (both medium height)
+  - Two LineCharts or two BarCharts
+- **Never** put these in a row:
+  - Sparklines + Table (extreme size mismatch)
+  - Sparklines + any full chart (sparklines are too small)
+  - Table + any chart (tables grow with content, unpredictable width)
+- **Tables** should always be in full-width column layout, never in a row with other components
+- **Sparklines** work best stacked vertically as a group, or inline with Metric/KeyValue components — not paired with charts
+- Match `height` props when pairing two SVG charts in a row (e.g. both `height: 10`)
+
+**Layout tips:**
+- Side-by-side layouts work well with `flexDirection: "row"` and `gap: 4`
+- SVG charts are capped at their maxWidth and won't stretch beyond it
+- BarChart is also capped — its `width` prop × 6 = max pixels
+- Colors use hex values (e.g. `"#22c55e"`) for best results
+
+**Data tips:**
+- **BarChart**: Ensure data values have meaningful variation. If all values are near-identical (e.g. 99.7, 99.8, 99.9), bars will look identical — use a different chart or show the delta instead
+- **xLabels**: The number of labels should match the visual density. 6 labels for 12 data points is fine; 12 labels for 12 points may crowd the axis
 
 ## When to Use Which Component
 
