@@ -1,5 +1,5 @@
 ---
-name: gb-skills
+name: shutong
 description: >
   Expert usage of the gb (Ground Base) CLI — a local-first semantic search engine
   over document collections. Use when the user asks to: search their knowledge base,
