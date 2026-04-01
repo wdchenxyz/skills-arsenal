@@ -148,6 +148,75 @@ Important agent-specific rules:
 - use `InferAgentUIMessage<typeof agent>` for the UI type
 - pass `uiMessages`, not `messages`, to `createAgentUIStreamResponse`
 
+## Loop Control with `prepareStep`
+
+`prepareStep` is a callback on `streamText`/`generateText` that runs before each
+agent loop iteration. Use it to modify messages, switch models, or control tools
+mid-loop.
+
+### Parameters
+
+The callback receives:
+- `model` — current model configuration
+- `stepNumber` — current step index (0-based)
+- `steps` — all previous steps with results
+- `messages` — messages about to be sent to the model
+
+### Return
+
+Return an object with any combination of optional overrides:
+- `model` — switch to a different model
+- `messages` — modify the message array (compaction, trimming)
+- `activeTools` — specify available tools for this step
+- `toolChoice` — control tool selection behavior
+
+If nothing is returned, the agent continues with existing settings.
+
+### Context Compaction
+
+Use `prepareStep` to trim or summarize messages when conversation grows too long:
+
+```ts
+const result = streamText({
+  model,
+  messages,
+  tools,
+  stopWhen: [stepCountIs(10)],
+  prepareStep: ({ messages }) => {
+    if (messages.length > 20) {
+      const system = messages.filter(m => m.role === 'system');
+      const recent = messages.slice(-10);
+      return { messages: [...system, ...recent] };
+    }
+  },
+});
+```
+
+### Dynamic Model Switching
+
+```ts
+prepareStep: ({ stepNumber }) => {
+  if (stepNumber > 3) {
+    return { model: strongerModel };
+  }
+},
+```
+
+### Tool Phasing
+
+Restrict which tools are available at different stages:
+
+```ts
+prepareStep: ({ stepNumber }) => {
+  if (stepNumber === 0) {
+    return { activeTools: ['search'], toolChoice: { type: 'tool', toolName: 'search' } };
+  }
+  if (stepNumber > 5) {
+    return { activeTools: ['summarize'] };
+  }
+},
+```
+
 ## MCP Pattern
 
 The course shows both stdio and HTTP MCP clients.

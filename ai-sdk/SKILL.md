@@ -80,6 +80,6 @@ Before implementing agent consumption:
 - [UIMessage Patterns](references/ui-message-patterns.md) - `UIMessage` vs `ModelMessage`, validation, persistence, and chat IDs
 - [Structured Output and Multimodal](references/structured-output-and-multimodal.md) - `Output.object`, `streamObject`, `partialOutputStream`, and file parts
 - [Custom Streaming Patterns](references/custom-streaming-patterns.md) - `createUIMessageStream`, `data-*` parts, metadata, and start/finish rules
-- [Tools, Agents, and MCP](references/tools-agents-and-mcp.md) - `streamText` tool loops, `ToolLoopAgent`, MCP, and approval flows
+- [Tools, Agents, and MCP](references/tools-agents-and-mcp.md) - `streamText` tool loops, `ToolLoopAgent`, MCP, approval flows, and `prepareStep` loop control
 - [Workflows and Advanced Patterns](references/workflows-and-advanced-patterns.md) - Multi-step workflows, routers, comparison UIs, and research flows
 - [Evals and Observability](references/evals-and-observability.md) - Evalite, LLM judges, Langfuse, and course evaluation patterns
