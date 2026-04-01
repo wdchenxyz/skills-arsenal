@@ -102,7 +102,7 @@ If prop names differ from Splash conventions, add an adapter in `src/app/compone
 ### Images
 | Component | Key Props |
 |-----------|-----------|
-| `Image` | `src: string (absolute path to local file), alt?: string, width?: number, height?: number` |
+| `Image` | `src: string (absolute path to local file), alt?: string, width?: number, height?: number, background?: string (wraps image with bg color, useful for transparent PNGs on dark themes)` |
 
 **Image rendering details:**
 - `src` must be an absolute file path (e.g. `/tmp/screenshot.png`). Supported formats: PNG, JPEG, GIF, WebP, SVG.
@@ -115,33 +115,33 @@ If prop names differ from Splash conventions, add an adapter in `src/app/compone
 |-----------|-----------|
 | `Sparkline` | `data: number[], width?: number, label?: string, color?: string, min?: number, max?: number` |
 | `LineChart` | `data?: number[], series?: {data: number[], label?: string, color?: string, fill?: boolean}[], width?: number, height?: number, label?: string, color?: string, showAxis?: boolean (default true), fill?: boolean, xLabels?: string[]` |
-| `Histogram` | `data: number[], bins?: number (default 15), width?: number, label?: string, color?: string, showValues?: boolean (default true)` |
+| `Histogram` | `data: number[], bins?: number (default 15), width?: number, height?: number, label?: string, color?: string, showValues?: boolean (default true)` |
 | `Heatmap` | `data: number[][], xLabels?: string[], yLabels?: string[], label?: string, color?: string ("green"\|"red"\|"blue"\|"yellow"\|"cyan"\|"magenta"\|"white"), showValues?: boolean (default false), cellWidth?: number` |
-| `BarChart` | `data: {label: string, value: number}[], width?: number` |
+| `BarChart` | `data: {label: string, value: number, color?: string}[], width?: number, showValues?: boolean (default true), showPercentage?: boolean (default false)` |
 | `Table` | `columns: {header: string, key: string, width?: number, align?: string}[], rows: Record<string, string>[]` |
-| `ProgressBar` | `progress: number (0-1), label?: string, width?: number` |
-| `Metric` | `label: string, value: string\|number, trend?: "up"\|"down", detail?: string` |
+| `ProgressBar` | `progress: number (0-1), label?: string, width?: number, value?: number (0-100, bypasses fraction conversion), max?: number (default 100)` |
+| `Metric` | `label: string, value: string\|number, trend?: "up"\|"down"\|"neutral", detail?: string` |
 
 ### Layout
 | Component | Key Props |
 |-----------|-----------|
-| `Box` | `flexDirection, padding, gap, borderStyle` |
+| `Box` | `flexDirection, padding, gap, borderStyle, justifyContent, alignItems, flexGrow, flexShrink, flexWrap, width, height, backgroundColor, borderColor` |
 | `Card` | `title?: string, children` |
 | `Heading` | `level: "h1"\|"h2"\|"h3"\|"h4", text: string` |
-| `Divider` | `title?: string` |
+| `Divider` | `title?: string, color?: string` |
 | `Spacer` | (no props) |
-| `Newline` | (no props) |
+| `Newline` | `count?: number` |
 
 ### Content
 | Component | Key Props |
 |-----------|-----------|
-| `Text` | `text: string` |
+| `Text` | `text: string, color?: string, backgroundColor?: string, bold?: boolean, italic?: boolean, underline?: boolean, strikethrough?: boolean, dimColor?: boolean` |
 | `Badge` | `label: string, variant?: "default"\|"success"\|"warning"\|"error"` |
-| `KeyValue` | `label: string, value: string, separator?: string` |
-| `List` | `items: string[], ordered?: boolean` |
-| `ListItem` | `title: string, subtitle?: string` |
-| `StatusLine` | `status: "info"\|"success"\|"warning"\|"error", text: string` |
-| `Link` | `url: string, label?: string` |
+| `KeyValue` | `label: string, value: string\|string[], separator?: string, labelColor?: string` |
+| `List` | `items: string[], ordered?: boolean, bulletChar?: string` |
+| `ListItem` | `title: string, subtitle?: string, leading?: string, trailing?: string` |
+| `StatusLine` | `status: "info"\|"success"\|"warning"\|"error", text: string, icon?: string` |
+| `Link` | `url: string, label?: string, color?: string` |
 | `Markdown` | `text: string` |
 | `Callout` | `type?: string, content: string, title?: string` |
 | `Timeline` | `items: {title, description?, date?, status?}[]` |
