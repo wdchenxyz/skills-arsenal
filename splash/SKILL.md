@@ -144,7 +144,7 @@ If prop names differ from Splash conventions, add an adapter in `src/app/compone
 | `Link` | `url: string, label?: string, color?: string` |
 | `Markdown` | `text: string` |
 | `Callout` | `type?: string, content: string, title?: string` |
-| `Timeline` | `items: {title, description?, date?, status?}[]` |
+| `Timeline` | `items: {title, description?, date?, status?}[]` — or use `dataFile` with column hints (see dataFile section). Status values: `done`/`completed` (filled circle), `pending`/`upcoming` (hollow circle), `current`/`active`/`in-progress` (blue). Browser only. |
 | `Spinner` | `label?: string` |
 
 ## Example Specs
@@ -295,6 +295,29 @@ If prop names differ from Splash conventions, add an adapter in `src/app/compone
           "label": "Request Volume",
           "color": "green",
           "showValues": true
+        },
+        "children": []
+      }
+    }
+  }
+}
+```
+
+### Timeline (inline)
+```json
+{
+  "spec": {
+    "root": "timeline",
+    "elements": {
+      "timeline": {
+        "type": "Timeline",
+        "props": {
+          "items": [
+            { "title": "Project Kickoff", "date": "2026-01-15", "status": "done", "description": "Team aligned on goals" },
+            { "title": "Alpha Release", "date": "2026-03-01", "status": "done", "description": "Internal testing" },
+            { "title": "Beta Release", "date": "2026-04-01", "status": "current", "description": "External testers" },
+            { "title": "GA Launch", "date": "2026-05-15", "status": "pending" }
+          ]
         },
         "children": []
       }
@@ -458,6 +481,340 @@ SVG charts are capped at their viewBox width (`width` prop × 8 pixels) and scal
 | Status overview | `StatusLine` |
 | Rich text | `Markdown` |
 | Local image / screenshot | `Image` |
+| Milestones / events / changelog | `Timeline` |
+
+## `dataFile` Support
+
+Instead of inline data, components can load data from JSON, CSV, or TSV files using the `dataFile` prop. The resolver parses the file and injects the appropriate props.
+
+### Supported Components
+
+| Component | `dataFile` produces | Column hint props |
+|-----------|--------------------|--------------------|
+| `LineChart`, `Sparkline`, `Histogram` | `data: number[]` | `dataColumn` (which numeric column), `xLabelsColumn` |
+| `BarChart` | `data: [{label, value}]` | `labelColumn`, `valueColumn` |
+| `Table` | `columns` + `rows` | (auto-detected from headers) |
+| `Heatmap` | `data: number[][]` | (JSON 2D array only) |
+| `Timeline` | `items: [{title, description?, date?, status?}]` | `titleColumn`, `descriptionColumn`, `dateColumn`, `statusColumn` |
+
+### Auto-detection
+- **Numeric columns**: Auto-detected from both JSON numbers and numeric strings in CSV/TSV (e.g. `"45"` is treated as numeric)
+- **BarChart**: Auto-detects the first string column as label, first numeric column as value
+- **Timeline**: Auto-detects the first string column as title; other columns require explicit hints
+
+### Example — Timeline from CSV
+```json
+{
+  "spec": {
+    "root": "t",
+    "elements": {
+      "t": {
+        "type": "Timeline",
+        "props": {
+          "dataFile": "/tmp/milestones.csv",
+          "dateColumn": "date",
+          "statusColumn": "status",
+          "descriptionColumn": "description"
+        },
+        "children": []
+      }
+    }
+  }
+}
+```
+
+Where `/tmp/milestones.csv`:
+```
+title,date,status,description
+Project Kickoff,2026-01-15,done,Initial team alignment
+Design Review,2026-02-01,done,UI/UX approval
+Beta Release,2026-04-01,pending,External testers
+```
+
+### Example — LineChart from CSV
+```json
+{
+  "spec": {
+    "root": "c",
+    "elements": {
+      "c": {
+        "type": "LineChart",
+        "props": { "dataFile": "/tmp/metrics.csv", "dataColumn": "latency", "xLabelsColumn": "date" },
+        "children": []
+      }
+    }
+  }
+}
+```
+
+## Layout Patterns
+
+### Insight Card
+
+When the user requests an "Insight Card" layout, render each visualization inside a Card with a two-column layout: chart on the left, Markdown narrative on the right. The narrative should provide analytical commentary — key findings, trends, action items — using rich Markdown (headers, bold metrics, bullet lists, blockquotes).
+
+**Structure per card:**
+```
+Card (title)
+  └── Box (flexDirection: "row", gap: 4)
+        ├── Chart (LineChart, BarChart, Histogram, Heatmap, etc.)
+        └── Markdown (analytical narrative)
+```
+
+**Browser spec pattern:**
+```json
+{
+  "card": {
+    "type": "Card",
+    "props": { "title": "Revenue Trend" },
+    "children": ["cardRow"]
+  },
+  "cardRow": {
+    "type": "Box",
+    "props": { "flexDirection": "row", "gap": 4 },
+    "children": ["chart", "narrative"]
+  },
+  "chart": {
+    "type": "LineChart",
+    "props": { "data": [12, 19, 25, 30, 38, 45], "width": 50, "height": 10 },
+    "children": []
+  },
+  "narrative": {
+    "type": "Markdown",
+    "props": { "text": "Revenue grew **18% YoY**.\n\n### Key Drivers\n- **Q4 surge**: +26%\n- Every month outperformed prior year\n\n> On track to cross **$50M/mo** by Q1." },
+    "children": []
+  }
+}
+```
+
+**Rules:**
+- **Browser**: Use `flexDirection: "row"` inside the Card to place chart and narrative side-by-side. Size charts at `width: 50, height: 10` for good proportions.
+- **Tmux**: Stack chart and narrative vertically (tmux is too narrow for side-by-side). Keep narratives short (1-2 sentences).
+- **Narrative content**: Write analytical commentary, not descriptions. Include bold metrics, headers for sections, bullet lists for breakdowns, and blockquotes for recommendations/actions.
+- **Chart selection**: Use full-sized charts (LineChart, BarChart, Histogram, Heatmap) — avoid Sparklines which are too small for side-by-side pairing with text.
+- **Multiple Insight Cards**: Stack cards vertically with `flexDirection: "column"` and `gap: 4` on the outer container.
+
+### Drill-Down
+
+When the user requests a "Drill-Down" layout, render three layers of increasing detail stacked vertically: summary metrics at the top, a trend chart in the middle, and a detailed table at the bottom. The flow guides the eye from glanceable KPIs → shape of the problem → root cause data.
+
+**Structure:**
+```
+Box (column)
+  ├── Heading + subtitle Text
+  ├── Box (row) — Metric cards (3-5 KPIs in individual Cards)
+  ├── Card — full-width trend chart (LineChart, width: 80, height: 14)
+  └── Card — full-width detail Table (sorted by severity/impact)
+```
+
+**Browser spec pattern:**
+```json
+{
+  "dashboard": {
+    "type": "Box",
+    "props": { "flexDirection": "column", "gap": 4, "padding": 2 },
+    "children": ["header", "metricsRow", "chartCard", "tableCard"]
+  },
+  "metricsRow": {
+    "type": "Box",
+    "props": { "flexDirection": "row", "gap": 4 },
+    "children": ["mc1", "mc2", "mc3", "mc4"]
+  },
+  "mc1": {
+    "type": "Card",
+    "props": {},
+    "children": ["met1"]
+  },
+  "met1": {
+    "type": "Metric",
+    "props": { "label": "Total Requests", "value": "1.24M", "trend": "up", "detail": "+8% vs yesterday" },
+    "children": []
+  },
+  "chartCard": {
+    "type": "Card",
+    "props": { "title": "Error Volume Over Time" },
+    "children": ["chart"]
+  },
+  "chart": {
+    "type": "LineChart",
+    "props": { "series": [{"data": [45, 80, 185, 280, 310, 250, 180, 110], "label": "5xx", "color": "#ef4444"}], "width": 80, "height": 14 },
+    "children": []
+  },
+  "tableCard": {
+    "type": "Card",
+    "props": { "title": "Error Breakdown by Endpoint" },
+    "children": ["table"]
+  },
+  "table": {
+    "type": "Table",
+    "props": {
+      "columns": [{"header": "Endpoint", "key": "endpoint"}, {"header": "Error Rate", "key": "rate"}, {"header": "Status", "key": "status"}],
+      "rows": [{"endpoint": "/api/payments", "rate": "12.4%", "status": "Critical"}]
+    },
+    "children": []
+  }
+}
+```
+
+**Rules:**
+- **Metric row**: 3-5 Metric components, each wrapped in its own Card. Use `trend` and `detail` props to show direction and context (e.g. "Target: <1%").
+- **Trend chart**: Full-width LineChart (`width: 80, height: 14`). Use multi-series to overlay related metrics (e.g. 5xx + 4xx + total). Use `xLabels` for time axis.
+- **Detail table**: Full-width Table sorted by impact/severity. Include a status column with visual indicators (e.g. "⚠ Critical", "△ Medium", "✓ OK").
+- **Tmux**: Same vertical structure works naturally. Reduce chart to `width: 35, height: 8` and trim table columns to fit.
+
+### Comparison Grid
+
+When the user requests a "Comparison Grid" layout, render the same chart type repeated in a 2×2 (or 2×N) grid, each with different data but identical axes and structure. This enables instant visual comparison across categories.
+
+**Structure:**
+```
+Box (column)
+  ├── Heading + subtitle Text
+  ├── Box (row) — [Card A, Card B]
+  └── Box (row) — [Card C, Card D]
+```
+
+Each card contains:
+```
+Card (title: category name)
+  ├── Chart (same type, same axes across all cards)
+  └── Box (row) — 2-3 Metric components for key stats
+```
+
+**Browser spec pattern:**
+```json
+{
+  "dashboard": {
+    "type": "Box",
+    "props": { "flexDirection": "column", "gap": 4, "padding": 2 },
+    "children": ["header", "row1", "row2"]
+  },
+  "row1": {
+    "type": "Box",
+    "props": { "flexDirection": "row", "gap": 4 },
+    "children": ["cardA", "cardB"]
+  },
+  "cardA": {
+    "type": "Card",
+    "props": { "title": "North America" },
+    "children": ["chartA", "metricsA"]
+  },
+  "chartA": {
+    "type": "LineChart",
+    "props": {
+      "series": [{"data": [120, 145, 170, 195], "label": "MAU", "color": "#3b82f6"}, {"data": [100, 118, 138, 168], "label": "Prior Year", "color": "#3b82f644"}],
+      "xLabels": ["Q1", "Q2", "Q3", "Q4"],
+      "width": 45, "height": 10
+    },
+    "children": []
+  },
+  "metricsA": {
+    "type": "Box",
+    "props": { "flexDirection": "row", "gap": 4 },
+    "children": ["mA1", "mA2"]
+  },
+  "mA1": {
+    "type": "Metric",
+    "props": { "label": "Current", "value": "195K", "trend": "up" },
+    "children": []
+  },
+  "mA2": {
+    "type": "Metric",
+    "props": { "label": "YoY Growth", "value": "+16%", "trend": "up" },
+    "children": []
+  }
+}
+```
+
+**Rules:**
+- **Consistency is key**: Every card must use the same chart type, same axis ranges, same `xLabels`, and same series structure (e.g. current + prior year). This allows the eye to compare shapes, not decode different formats.
+- **Color coding**: Assign each category a distinct primary color. Use the same color at reduced opacity (e.g. `"#3b82f644"`) for the comparison/prior-year series.
+- **Metrics below chart**: 2-3 Metric components in a row below each chart for key stats (e.g. current value, growth rate, churn).
+- **Grid size**: 2×2 is ideal. For 3 items use a 2+1 layout. For 5+ consider 3×N but reduce chart `width` to 35.
+- **Tmux**: Stack all cards vertically. Keep chart `width: 35, height: 8` and abbreviate labels.
+
+### Before/After
+
+When the user requests a "Before/After" layout, render a focused two-state comparison showing a metric pre/post a change (deploy, migration, experiment). The layout emphasizes the delta with side-by-side charts using identical axes and a verdict summary.
+
+**Structure:**
+```
+Box (column)
+  ├── Heading + subtitle Text (what changed and when)
+  ├── Box (row) — 3-5 Delta Metric cards (showing "old → new" with % change)
+  ├── Box (row) — [Card "Before" chart, Card "After" chart] (same chart type, same axes)
+  ├── Box (row) — [Card "Before" distribution, Card "After" distribution] (optional, for shape comparison)
+  └── Card "Verdict" — Markdown summary with conclusion and recommendation
+```
+
+**Browser spec pattern:**
+```json
+{
+  "dashboard": {
+    "type": "Box",
+    "props": { "flexDirection": "column", "gap": 4, "padding": 2 },
+    "children": ["header", "deltaRow", "chartsRow", "verdictCard"]
+  },
+  "deltaRow": {
+    "type": "Box",
+    "props": { "flexDirection": "row", "gap": 4 },
+    "children": ["dc1", "dc2", "dc3"]
+  },
+  "dc1": {
+    "type": "Card",
+    "props": {},
+    "children": ["d1"]
+  },
+  "d1": {
+    "type": "Metric",
+    "props": { "label": "P99 Latency", "value": "342ms → 85ms", "trend": "down", "detail": "-75%" },
+    "children": []
+  },
+  "chartsRow": {
+    "type": "Box",
+    "props": { "flexDirection": "row", "gap": 4 },
+    "children": ["beforeCard", "afterCard"]
+  },
+  "beforeCard": {
+    "type": "Card",
+    "props": { "title": "Before — Mar 21–27" },
+    "children": ["beforeChart"]
+  },
+  "beforeChart": {
+    "type": "LineChart",
+    "props": { "data": [85, 145, 250, 342, 230, 120, 88], "width": 45, "height": 12, "color": "#ef4444" },
+    "children": []
+  },
+  "afterCard": {
+    "type": "Card",
+    "props": { "title": "After — Mar 29–Apr 4" },
+    "children": ["afterChart"]
+  },
+  "afterChart": {
+    "type": "LineChart",
+    "props": { "data": [42, 55, 78, 85, 65, 48, 40], "width": 45, "height": 12, "color": "#22c55e" },
+    "children": []
+  },
+  "verdictCard": {
+    "type": "Card",
+    "props": { "title": "Verdict" },
+    "children": ["verdict"]
+  },
+  "verdict": {
+    "type": "Markdown",
+    "props": { "text": "### Migration: Success\n\n- **P99 dropped 75%** — now within SLA\n- **Error rate fell 87%**\n\n> **Recommendation**: Close the project." },
+    "children": []
+  }
+}
+```
+
+**Rules:**
+- **Delta metrics**: Use `"old → new"` format in the `value` prop with percentage change in `detail`. Use `trend: "down"` for metrics where lower is better (latency, errors) and `trend: "up"` where higher is better (throughput).
+- **Color coding**: Before = red/warm (`#ef4444`), After = green/cool (`#22c55e`). This convention is universal — don't swap it.
+- **Identical axes**: Both charts must use the same `xLabels`, same time granularity, and ideally the same Y scale so shapes are directly comparable.
+- **Optional distribution row**: Add side-by-side Histograms when the *shape* of the distribution matters (e.g. long tail elimination). Use matching `bins` count and colors.
+- **Verdict card**: Always end with a Markdown verdict — was the change a success? Include a recommendation for next steps.
+- **Tmux**: Stack all sections vertically. Use `width: 35, height: 8` for charts. Keep delta metrics as a compact list instead of a row of cards.
 
 ## Dynamic State
 
