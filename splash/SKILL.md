@@ -42,7 +42,7 @@ Flat element map with root pointer. Compose layouts with `Box` containers (`flex
 | Deviation/P&L | `BaselineChart` | Green above/red below baseline |
 | Distribution | `Histogram` | Binned frequency |
 | 2D grid/correlation | `Heatmap` | Color matrix |
-| Categorical comparison | `BarChart` | Horizontal bars |
+| Categorical comparison | `BarChart` | recharts, multi-series, horizontal/vertical, tooltips |
 | Tabular data | `Table` | columns + rows |
 | Single metric | `Metric` | Trend arrow + detail |
 | Progress | `ProgressBar` | 0-1 fraction, browser-only |

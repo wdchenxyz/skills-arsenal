@@ -8,7 +8,7 @@ Instead of inline data, components can load data from JSON, CSV, or TSV files us
 |-----------|--------------------|--------------------|
 | `LineChart`, `AreaChart`, `BaselineChart`, `Sparkline`, `Histogram` | `data: number[]` | `dataColumn` (which numeric column), `xLabelsColumn` |
 | `CandlestickChart` | `data: [{time, open, high, low, close}]` | Auto-detects OHLC columns; first non-OHLC column used as `time` |
-| `BarChart` | `data: [{label, value}]` | `labelColumn`, `valueColumn` |
+| `BarChart` | `data: [{categoryKey: ..., series1: N, ...}], categoryKey, series[]` | `categoryKey` (explicit category column). Auto-detects first string column as category, all numeric columns as series. |
 | `Table` | `columns` + `rows` | (auto-detected from headers) |
 | `Heatmap` | `data: number[][]` | (JSON 2D array only) |
 | `Timeline` | `items: [{title, description?, date?, status?}]` | `titleColumn`, `descriptionColumn`, `dateColumn`, `statusColumn` |
@@ -16,7 +16,7 @@ Instead of inline data, components can load data from JSON, CSV, or TSV files us
 ## Auto-detection
 
 - **Numeric columns**: Auto-detected from both JSON numbers and numeric strings in CSV/TSV (e.g. `"45"` is treated as numeric).
-- **BarChart**: Auto-detects first string column as label, first numeric column as value.
+- **BarChart**: Auto-detects first string column as `categoryKey`, ALL numeric columns as `series` (multi-series). Colors assigned from `var(--chart-1)` through `var(--chart-5)`.
 - **Timeline**: Auto-detects first string column as title; other columns require explicit hints.
 
 ## Example: Timeline from CSV

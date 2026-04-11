@@ -11,6 +11,14 @@ These render with HTML5 Canvas in the browser and support **interactive crosshai
 | `AreaChart` | `data: number[] \| {time: string\|number, value: number}[], width?, height?, label?, color?, lineColor?`. Gradient fill below line. Tmux: falls back to LineChart. |
 | `BaselineChart` | `data: number[] \| {time: string\|number, value: number}[], width?, height?, label?, baseValue? (default: mean), topLineColor? (default "#22c55e"), bottomLineColor? (default "#ef4444")`. Green above baseline, red below. Tmux: falls back to LineChart. |
 
+## Recharts Charts (browser — recharts + shadcn chart primitives)
+
+Interactive SVG charts with tooltips, rendered via recharts wrapped in shadcn `ChartContainer`. Browser-only.
+
+| Component | Key Props |
+|-----------|-----------|
+| `BarChart` | `data: Record<string, unknown>[], categoryKey?: string, series?: {dataKey: string, color?: string, label?: string}[], layout? ("horizontal"\|"vertical", default "horizontal"), label?, showTooltip? (default true), width?, height?`. Multi-series auto-detected from data keys. `layout: "horizontal"` = horizontal bars, `"vertical"` = vertical bars. Colors default to `var(--chart-1)` through `var(--chart-5)`. |
+
 ## Static SVG Charts (browser and tmux)
 
 | Component | Key Props |
@@ -18,7 +26,6 @@ These render with HTML5 Canvas in the browser and support **interactive crosshai
 | `Sparkline` | `data: number[], width?, label?, color?, min?, max?` |
 | `Histogram` | `data: number[], bins? (default 15), width?, height?, label?, color?, showValues? (default true)` |
 | `Heatmap` | `data: number[][], xLabels?: string[], yLabels?: string[], label?, color? ("green"\|"red"\|"blue"\|"yellow"\|"cyan"\|"magenta"\|"white"), showValues? (default false), cellWidth?` |
-| `BarChart` | `data: {label: string, value: number, color?: string}[], width?, showValues? (default true), showPercentage? (default false)` |
 
 ## Data Display
 

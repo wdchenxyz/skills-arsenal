@@ -17,7 +17,7 @@
 }
 ```
 
-## BarChart
+## BarChart (single-series, horizontal bars)
 
 ```json
 {
@@ -28,10 +28,42 @@
         "type": "BarChart",
         "props": {
           "data": [
-            { "label": "api", "value": 45 },
-            { "label": "web", "value": 30 },
-            { "label": "worker", "value": 78 }
-          ]
+            { "service": "API Gateway", "latency": 45 },
+            { "service": "Web Server", "latency": 30 },
+            { "service": "Database", "latency": 12 }
+          ],
+          "categoryKey": "service",
+          "label": "Service Latency (ms)"
+        },
+        "children": []
+      }
+    }
+  }
+}
+```
+
+## BarChart (multi-series, vertical bars)
+
+```json
+{
+  "spec": {
+    "root": "chart",
+    "elements": {
+      "chart": {
+        "type": "BarChart",
+        "props": {
+          "data": [
+            { "month": "Jan", "desktop": 186, "mobile": 80 },
+            { "month": "Feb", "desktop": 305, "mobile": 200 },
+            { "month": "Mar", "desktop": 237, "mobile": 120 }
+          ],
+          "categoryKey": "month",
+          "series": [
+            { "dataKey": "desktop", "color": "var(--chart-1)", "label": "Desktop" },
+            { "dataKey": "mobile", "color": "var(--chart-2)", "label": "Mobile" }
+          ],
+          "layout": "vertical",
+          "label": "Monthly Traffic"
         },
         "children": []
       }

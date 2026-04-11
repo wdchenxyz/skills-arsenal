@@ -57,10 +57,10 @@ Match `height` props when pairing two SVG charts in a row (e.g. both `height: 10
 
 - Side-by-side layouts work well with `flexDirection: "row"` and `gap: 4`
 - SVG charts are capped at their maxWidth and won't stretch beyond it
-- BarChart is also capped — its `width` prop x 6 = max pixels
+- BarChart uses `width x 8` pixels (same as Canvas charts) with responsive fallback when omitted (300px height default)
 - Colors use hex values (e.g. `"#22c55e"`) for best results
 
 ## Data Tips
 
-- **BarChart**: Ensure data values have meaningful variation. If all values are near-identical (e.g. 99.7, 99.8, 99.9), bars will look identical — use a different chart or show the delta instead.
+- **BarChart**: Ensure data values have meaningful variation. If all values are near-identical (e.g. 99.7, 99.8, 99.9), bars will look identical — use a different chart or show the delta instead. For multi-series, limit to 5 series max (matches the 5-color palette). `height` prop matters more than `width` for horizontal bars.
 - **xLabels**: The number of labels should match the visual density. 6 labels for 12 data points is fine; 12 labels for 12 points may crowd the axis.

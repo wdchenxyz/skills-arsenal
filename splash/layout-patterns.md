@@ -44,6 +44,49 @@ Card (title)
 - **Narrative**: Write analytical commentary, not descriptions. Bold metrics, headers, bullet lists, blockquotes.
 - **Chart selection**: Use full-sized charts — avoid Sparklines (too small for side-by-side pairing).
 - **Multiple cards**: Stack vertically with `flexDirection: "column"` and `gap: 4`.
+- **BarChart cards**: Use `flexDirection: "column"` (chart on top, narrative below) instead of row layout. BarCharts need full card width to render readable bars — side-by-side layout compresses them into an unreadable state, especially multi-series grouped bars. Set `width: 80, height: 14-16` for the chart. Keep the narrative as a single flowing paragraph below.
+
+### BarChart Insight Card variant
+
+BarCharts stack vertically — chart on top, narrative below — because grouped bars need full card width.
+
+```json
+{
+  "card": {
+    "type": "Card",
+    "props": { "title": "Spend by Department" },
+    "children": ["cardCol"]
+  },
+  "cardCol": {
+    "type": "Box",
+    "props": { "flexDirection": "column", "gap": 2 },
+    "children": ["chart", "narrative"]
+  },
+  "chart": {
+    "type": "BarChart",
+    "props": {
+      "data": [
+        { "quarter": "Q1", "engineering": 820, "marketing": 450 },
+        { "quarter": "Q2", "engineering": 880, "marketing": 520 }
+      ],
+      "categoryKey": "quarter",
+      "series": [
+        { "dataKey": "engineering", "color": "#3b82f6", "label": "Engineering" },
+        { "dataKey": "marketing", "color": "#10b981", "label": "Marketing" }
+      ],
+      "layout": "vertical",
+      "label": "Spend ($K)",
+      "width": 80, "height": 14
+    },
+    "children": []
+  },
+  "narrative": {
+    "type": "Markdown",
+    "props": { "text": "Engineering spend grew **24% YoY**. Marketing up **36%** from Q4 campaign push." },
+    "children": []
+  }
+}
+```
 
 ---
 
