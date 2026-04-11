@@ -6,7 +6,7 @@ These render with HTML5 Canvas in the browser and support **interactive crosshai
 
 | Component | Key Props |
 |-----------|-----------|
-| `LineChart` | `data?: number[], series?: {data: number[], label?: string, color?: string, fill?: boolean}[], width?, height?, label?, color?, showAxis? (default true), fill?`. Multi-series via `series` array. |
+| `LineChart` | `data?: number[] \| {time: string\|number, value: number}[], series?: {data: number[] \| {time: string\|number, value: number}[], label?: string, color?: string, fill?: boolean}[], width?, height?, label?, color?, showAxis? (default true), fill?, xLabels?: string[]`. Multi-series via `series` array. Use `{time, value}` format for proper date axes; `xLabels` with `number[]` data for categorical labels. |
 | `CandlestickChart` | `data: {time: string\|number, open: number, high: number, low: number, close: number}[], width?, height?, label?, upColor? (default "#22c55e"), downColor? (default "#ef4444")`. **Browser-only.** |
 | `AreaChart` | `data: number[] \| {time: string\|number, value: number}[], width?, height?, label?, color?, lineColor?`. Gradient fill below line. Tmux: falls back to LineChart. |
 | `BaselineChart` | `data: number[] \| {time: string\|number, value: number}[], width?, height?, label?, baseValue? (default: mean), topLineColor? (default "#22c55e"), bottomLineColor? (default "#ef4444")`. Green above baseline, red below. Tmux: falls back to LineChart. |

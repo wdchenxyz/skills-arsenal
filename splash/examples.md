@@ -119,6 +119,8 @@
 
 ## LineChart (multi-series with xLabels)
 
+Categorical x-axis: pass `number[]` data with `xLabels` for custom tick labels (browser renders via synthetic timestamps + tickMarkFormatter).
+
 ```json
 {
   "spec": {
@@ -135,6 +137,49 @@
           "xLabels": ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
           "width": 35,
           "height": 8
+        },
+        "children": []
+      }
+    }
+  }
+}
+```
+
+## LineChart (multi-series with time-value data)
+
+Time-series x-axis: pass `{time: "YYYY-MM-DD", value: number}` objects for proper date axes with correct spacing for gaps. Preferred for date-indexed data.
+
+```json
+{
+  "spec": {
+    "root": "chart",
+    "elements": {
+      "chart": {
+        "type": "LineChart",
+        "props": {
+          "label": "Daily Revenue",
+          "series": [
+            {
+              "data": [
+                {"time": "2026-01-06", "value": 120},
+                {"time": "2026-01-07", "value": 145},
+                {"time": "2026-01-10", "value": 170},
+                {"time": "2026-01-13", "value": 195}
+              ],
+              "label": "Product A", "color": "#8b5cf6"
+            },
+            {
+              "data": [
+                {"time": "2026-01-06", "value": 80},
+                {"time": "2026-01-07", "value": 95},
+                {"time": "2026-01-10", "value": 110},
+                {"time": "2026-01-13", "value": 130}
+              ],
+              "label": "Product B", "color": "#3b82f6"
+            }
+          ],
+          "width": 60,
+          "height": 12
         },
         "children": []
       }
