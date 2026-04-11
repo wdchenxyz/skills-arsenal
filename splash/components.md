@@ -2,7 +2,7 @@
 
 ## Interactive Canvas Charts (browser — TradingView lightweight-charts)
 
-These render with HTML5 Canvas in the browser and support **interactive crosshair**, **zoom** (mouse wheel), and **pan** (click+drag). In tmux, AreaChart and BaselineChart fall back to LineChart; CandlestickChart has no tmux fallback.
+These render with HTML5 Canvas in the browser and support **interactive crosshair**, **zoom** (mouse wheel), and **pan** (click+drag). In tmux, AreaChart and BaselineChart fall back to LineChart; CandlestickChart and Histogram have no tmux fallback.
 
 | Component | Key Props |
 |-----------|-----------|
@@ -10,6 +10,7 @@ These render with HTML5 Canvas in the browser and support **interactive crosshai
 | `CandlestickChart` | `data: {time: string\|number, open: number, high: number, low: number, close: number}[], width?, height?, label?, upColor? (default "#22c55e"), downColor? (default "#ef4444")`. **Browser-only.** |
 | `AreaChart` | `data: number[] \| {time: string\|number, value: number}[], width?, height?, label?, color?, lineColor?`. Gradient fill below line. Tmux: falls back to LineChart. |
 | `BaselineChart` | `data: number[] \| {time: string\|number, value: number}[], width?, height?, label?, baseValue? (default: mean), topLineColor? (default "#22c55e"), bottomLineColor? (default "#ef4444")`. Green above baseline, red below. Tmux: falls back to LineChart. |
+| `Histogram` | `data: number[], bins? (default 15), width?, height?, label?, color?, showValues? (default true)`. Vertical bars, interactive crosshair. **Browser-only.** |
 
 ## Recharts Charts (browser — recharts + shadcn chart primitives)
 
@@ -18,13 +19,12 @@ Interactive SVG charts with tooltips, rendered via recharts wrapped in shadcn `C
 | Component | Key Props |
 |-----------|-----------|
 | `BarChart` | `data: Record<string, unknown>[], categoryKey?: string, series?: {dataKey: string, color?: string, label?: string}[], layout? ("horizontal"\|"vertical", default "horizontal"), label?, showTooltip? (default true), width?, height?`. Multi-series auto-detected from data keys. `layout: "horizontal"` = horizontal bars, `"vertical"` = vertical bars. Colors default to `var(--chart-1)` through `var(--chart-5)`. |
+| `Sparkline` | `data: number[], width?, label?, color?, min?, max?`. Compact inline chart, no axes/grid/tooltip. |
 
 ## Static SVG Charts (browser and tmux)
 
 | Component | Key Props |
 |-----------|-----------|
-| `Sparkline` | `data: number[], width?, label?, color?, min?, max?` |
-| `Histogram` | `data: number[], bins? (default 15), width?, height?, label?, color?, showValues? (default true)` |
 | `Heatmap` | `data: number[][], xLabels?: string[], yLabels?: string[], label?, color? ("green"\|"red"\|"blue"\|"yellow"\|"cyan"\|"magenta"\|"white"), showValues? (default false), cellWidth?` |
 
 ## Data Display

@@ -35,12 +35,12 @@ Flat element map with root pointer. Compose layouts with `Box` containers (`flex
 
 | Data Type | Component | Notes |
 |-----------|-----------|-------|
-| Time series (quick) | `Sparkline` | SVG, inline |
+| Time series (quick) | `Sparkline` | recharts, inline, responsive |
 | Time series (detailed) | `LineChart` | Canvas, multi-series, interactive |
 | Financial OHLC | `CandlestickChart` | Browser-only |
 | Cumulative/utilization | `AreaChart` | Gradient fill, Canvas |
 | Deviation/P&L | `BaselineChart` | Green above/red below baseline |
-| Distribution | `Histogram` | Binned frequency |
+| Distribution | `Histogram` | Canvas, interactive, stats overlay |
 | 2D grid/correlation | `Heatmap` | Color matrix |
 | Categorical comparison | `BarChart` | recharts, multi-series, horizontal/vertical, tooltips |
 | Tabular data | `Table` | columns + rows |
