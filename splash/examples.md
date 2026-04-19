@@ -212,6 +212,8 @@ Time-series x-axis: pass `{time: "YYYY-MM-DD", value: number}` objects for prope
 
 ## CandlestickChart (browser-only)
 
+Daily bars use `"YYYY-MM-DD"`. For intraday, pass **unix seconds** or an **ISO 8601 string with time** — Splash parses both.
+
 ```json
 {
   "spec": {
@@ -227,6 +229,31 @@ Time-series x-axis: pass `{time: "YYYY-MM-DD", value: number}` objects for prope
             {"time": "2024-01-04", "open": 182.15, "high": 183.09, "low": 180.88, "close": 181.91},
             {"time": "2024-01-05", "open": 181.99, "high": 182.76, "low": 180.17, "close": 181.18},
             {"time": "2024-01-08", "open": 182.09, "high": 185.60, "low": 181.50, "close": 185.56}
+          ],
+          "width": 60, "height": 14
+        },
+        "children": []
+      }
+    }
+  }
+}
+```
+
+### Intraday (ISO 8601 times)
+
+```json
+{
+  "spec": {
+    "root": "chart",
+    "elements": {
+      "chart": {
+        "type": "CandlestickChart",
+        "props": {
+          "label": "BTC-USD · 5m",
+          "data": [
+            {"time": "2026-04-18T14:00:00Z", "open": 64200, "high": 64800, "low": 64100, "close": 64650},
+            {"time": "2026-04-18T14:05:00Z", "open": 64650, "high": 64700, "low": 64200, "close": 64280},
+            {"time": "2026-04-18T14:10:00Z", "open": 64280, "high": 64500, "low": 64180, "close": 64480}
           ],
           "width": 60, "height": 14
         },
@@ -358,6 +385,75 @@ Time-series x-axis: pass `{time: "YYYY-MM-DD", value: number}` objects for prope
   }
 }
 ```
+
+## KeyValue (dict grid)
+
+Use the dict form when you have more than one pair — env vars, metadata, spec inspection.
+
+```json
+{
+  "spec": {
+    "root": "kv",
+    "elements": {
+      "kv": {
+        "type": "KeyValue",
+        "props": {
+          "label": "env",
+          "data": {
+            "NODE_ENV": "production",
+            "PORT": "3456",
+            "LOG_LEVEL": "debug",
+            "BUILD": "48a21f"
+          }
+        },
+        "children": []
+      }
+    }
+  }
+}
+```
+
+## ProgressBar
+
+```json
+{
+  "spec": {
+    "root": "p",
+    "elements": {
+      "p": {
+        "type": "ProgressBar",
+        "props": { "progress": 0.62, "label": "index rebuild · eta 4m" },
+        "children": []
+      }
+    }
+  }
+}
+```
+
+To hide the right-aligned percent: `showPercent: false`. To swap the fill color: `color: "#3b7a4d"`.
+
+## Callout
+
+```json
+{
+  "spec": {
+    "root": "co",
+    "elements": {
+      "co": {
+        "type": "Callout",
+        "props": {
+          "type": "info",
+          "title": "deploy started",
+          "text": "rev 48a21f · rolling to production · eta 3m"
+        },
+        "children": []
+      }
+    }
+  }
+}
+```
+
+Variants: `info` (blue), `tip` (green), `warning` (yellow), `important` (red). `text` and `content` are equivalent.
 
 ## Image
 

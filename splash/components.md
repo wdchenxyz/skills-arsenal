@@ -1,5 +1,16 @@
 # Component Props Reference
 
+## Time formats (Canvas charts)
+
+LineChart, AreaChart, BaselineChart, and CandlestickChart all accept the same `time` values in their data points:
+
+- **Unix seconds** (number): `1776470400` — always works, unambiguous.
+- **ISO 8601 string** (parsed automatically): `"2026-04-18T00:00:00Z"`, `"2026-04-18T14:30:00-07:00"`. Splash converts via `Date.parse`.
+- **Business-day string**: `"2026-04-18"` — pass-through, good for daily data.
+- **Plain `number[]`**: indices are offset onto a synthetic daily base so all points render on a spaced axis; use `xLabels` for custom tick text.
+
+Prefer unix seconds or ISO for sub-daily granularity; `"YYYY-MM-DD"` only resolves to day-level spacing.
+
 ## Interactive Canvas Charts (browser — TradingView lightweight-charts)
 
 These render with HTML5 Canvas in the browser and support **interactive crosshair**, **zoom** (mouse wheel), and **pan** (click+drag). In tmux, AreaChart and BaselineChart fall back to LineChart; CandlestickChart and Histogram have no tmux fallback.
@@ -25,14 +36,14 @@ Interactive SVG charts with tooltips, rendered via recharts wrapped in shadcn `C
 
 | Component | Key Props |
 |-----------|-----------|
-| `Heatmap` | `data: number[][], xLabels?: string[], yLabels?: string[], label?, color? ("green"\|"red"\|"blue"\|"yellow"\|"cyan"\|"magenta"\|"white"), showValues? (default false), cellWidth?` |
+| `Heatmap` | `data: number[][], xLabels?: string[], yLabels?: string[], label?, color? ("green"\|"red"\|"blue"\|"yellow"\|"cyan"\|"magenta"\|"white"), showValues? (default false), cellWidth?`. Gradient is **light→dark**: high values render as the strongest ink, low values blend into the paper. Flip your data if you want the reverse encoding. |
 
 ## Data Display
 
 | Component | Key Props |
 |-----------|-----------|
 | `Table` | `columns: {header: string, key: string, width?, align?}[], rows: Record<string, string>[]` |
-| `ProgressBar` | `progress: number (0-1), label?, width?, value? (0-100, bypasses fraction conversion), max? (default 100)`. **Browser-only** (shadcn adapter). |
+| `ProgressBar` | `progress: number (0-1), label?, value? (0-100, bypasses fraction conversion), max? (default 100), color? (default splash orange), showPercent? (default true)`. Browser renders a paper-themed track with the percent readout right-aligned next to the label. |
 | `Metric` | `label: string, value: string\|number, trend?: "up"\|"down"\|"neutral", detail?: string` |
 
 ## Images
@@ -63,13 +74,13 @@ Interactive SVG charts with tooltips, rendered via recharts wrapped in shadcn `C
 |-----------|-----------|
 | `Text` | `text: string, color?, backgroundColor?, bold?, italic?, underline?, strikethrough?, dimColor?` |
 | `Badge` | `label: string, variant?: "default"\|"success"\|"warning"\|"error"` |
-| `KeyValue` | `label: string, value: string\|string[], separator?, labelColor?` |
+| `KeyValue` | Two forms. **Single pair**: `label: string, value: string\|string[], separator?, labelColor?`. **Dict grid** (for env vars, metadata, multiple pairs): `label?: string, data: Record<string, unknown>` — renders as an aligned two-column grid. Prefer the dict form when you have more than one pair. |
 | `List` | `items: string[], ordered?, bulletChar?` |
 | `ListItem` | `title: string, subtitle?, leading?, trailing?` |
 | `StatusLine` | `status: "info"\|"success"\|"warning"\|"error", text: string, icon?` |
 | `Link` | `url: string, label?, color?` |
 | `Markdown` | `text: string` |
-| `Callout` | `type?, content: string, title?` |
+| `Callout` | `type?: "info"\|"warning"\|"tip"\|"important" (default "info"), title?: string, content: string` (or `text` — aliased). Paper-themed light tint + accent left border per variant. |
 | `Timeline` | `items: {title, description?, date?, status?}[]`. Status: `done`/`completed` (filled), `pending`/`upcoming` (hollow), `current`/`active`/`in-progress` (blue). Browser-only. Also supports `dataFile` (see datafile.md). |
 | `Spinner` | `label?: string` |
 
